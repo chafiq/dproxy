@@ -16,7 +16,7 @@ helps:
 .PHONY: ca cert
 
 ca: ## CA
-	./bin/ca-gen -v -c FR -s Marseille -l Marseille -o DEV -u DEV -n "TRAEFIK SELF-SIGNED CA - DEV" -e ca@localhost $(DIR)/CA.key $(DIR)/CA.crt
+	./bin/ca-gen -v -c FR -s Marseille -l Marseille -o DEV -u DEV -n "TRAEFIK SELF-SIGNED CA - DEV" -e ca@example.com $(DIR)/CA.key $(DIR)/CA.crt
 
 cert: ## CA
 	./bin/cert-gen -v -c FR -s Marseille -l Marseille -o Develop -u Develop -n $(N) -e admin@$(N) -a $(A) $(DIR)/CA.key $(DIR)/CA.crt $(DIR)/$(N).key $(DIR)/$(N).csr $(DIR)/$(N).crt

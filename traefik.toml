@@ -35,7 +35,7 @@
   [providers.docker]
     endpoint = "unix:///var/run/docker.sock"
     watch = true
-    network = "proxy"
+    network = "traefik"
     exposedByDefault = true
     swarmMode = false
     [providers.file]

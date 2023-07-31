@@ -16,8 +16,8 @@ services:
       - MYSQL_HOST=mariadb
       - MYSQL_PORT=3306
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=symfony
-      - MYSQL_PASSWORD=symfony
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pass
     labels:
       - traefik.enable=true
       - traefik.port=3306
@@ -36,7 +36,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.toml:/traefik.toml:cached
-      - ./traefik/conf.d/dynamic.toml:/traefik/conf.d/dynamic.toml:cached
+      - ./traefik/conf.d:/traefik/conf.d:cached
       - ./certs:/certs:cached
     networks:
       - traefik
