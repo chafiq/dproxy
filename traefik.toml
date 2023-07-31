@@ -1,0 +1,42 @@
+[global]
+  sendAnonymousUsage = false
+
+[log]
+  level = "DEBUG"
+  format = "common"
+
+[api]
+  dashboard = true
+  debug = false
+  insecure = true
+
+[entryPoints]
+  [entryPoints.insecure]
+    address = ":80"
+  [entryPoints.secure]
+    address = ":443"
+
+[[tls.certificates]]
+  certFile = "/certs/CA.crt"
+  keyFile = "/certs/CA.key"
+
+[http]
+  [http.middlewares]
+    [http.middlewares.security.headers]
+      frameDeny = true
+      sslRedirect = true
+      browserXssFilter = true
+      contentTypeNosniff = true
+      stsIncludeSubdomains = true
+      stsPreload = true
+      stsSeconds = 31536000
+
+[providers]
+  [providers.docker]
+    endpoint = "unix:///var/run/docker.sock"
+    watch = true
+    network = "proxy"
+    exposedByDefault = true
+    swarmMode = false
+    [providers.file]
+        directory = '/traefik/conf.d/'

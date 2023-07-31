@@ -1,0 +1,8 @@
+config
+haproxy
+.srl
+config.toml
+.env
+portainer
+certs/*
+traefik/conf.d/tls.certificates.*

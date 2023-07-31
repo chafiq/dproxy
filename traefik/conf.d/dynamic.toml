@@ -1,0 +1,15 @@
+[[tls.certificates]]
+  certFile = "/certs/CA.crt"
+  keyFile = "/certs/CA.key"
+
+[http]
+  [http.middlewares]
+    [http.middlewares.security.headers]
+      frameDeny = true
+      sslRedirect = true
+      browserXssFilter = true
+      contentTypeNosniff = true
+      forceSTSHeader = true
+      stsIncludeSubdomains = true
+      stsPreload = true
+      stsSeconds = 31536000

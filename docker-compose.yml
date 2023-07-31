@@ -1,0 +1,82 @@
+version: '3'
+services:
+
+  mariadb:
+    image: mariadb:10.5
+    command: --character-set-server=utf8mb4 --max_allowed_packet=512M
+    container_name: dproxy-mariadb
+    restart: unless-stopped
+    ports:
+      - '63306:3306'
+    volumes:
+      - mariadb:/var/lib/mysql
+    networks:
+      - traefik
+    environment:
+      - MYSQL_HOST=mariadb
+      - MYSQL_PORT=3306
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=symfony
+      - MYSQL_PASSWORD=symfony
+    labels:
+      - traefik.enable=true
+      - traefik.port=3306
+      - traefik.http.routers.mariadb.tls=true
+      - traefik.http.routers.mariadb.entrypoints=secure
+      - traefik.http.routers.mariadb.rule=Host(`mariadb.${DOMAIN}`)
+
+  traefik:
+    image: traefik:2.6
+    container_name: dproxy-traefik
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.toml:/traefik.toml:cached
+      - ./traefik/conf.d/dynamic.toml:/traefik/conf.d/dynamic.toml:cached
+      - ./certs:/certs:cached
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.entrypoints=secure
+      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik.service=api@internal
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: dproxy-mailhog
+    user: root
+    networks:
+      - mailhog
+      - traefik
+    ports:
+      - "8025"
+      - "0.0.0.0:1025:25"
+    environment:
+      - MH_SMTP_BIND_ADDR=0.0.0.0:25
+      - MH_UI_BIND_ADDR=0.0.0.0:8025
+      - MH_API_BIND_ADDR=0.0.0.0:8025
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailcatcher.tls=true
+      - traefik.http.routers.mailcatcher.entrypoints=secure
+      - traefik.http.routers.mailcatcher.rule=Host(`mailcatcher.${DOMAIN}`)
+      - traefik.http.services.mailcatcher.loadbalancer.server.port=8025
+    restart: always
+
+volumes:
+  mariadb:
+    driver: local
+
+networks:
+  traefik:
+    external: true
+
+  mailhog:
+    external: true
