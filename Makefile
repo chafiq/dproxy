@@ -2,6 +2,9 @@
 
 include .env
 .PHONY: helps
+args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
+
+CONTAINER_MARIADB := @docker exec -it dproxy-mariadb
 
 .DEFAULT_GOAL := helps
 
@@ -23,6 +26,10 @@ cert: ## CA
 	echo "[[tls.certificates]]" > ./traefik/conf.d/tls.certificates.$(N).toml
 	echo '  certFile = "/certs/$(N).crt"' >> ./traefik/conf.d/tls.certificates.$(N).toml
 	echo '  keyFile = "/certs/$(N).key"' >> ./traefik/conf.d/tls.certificates.$(N).toml
+
+db: ## Create Database
+	${CONTAINER_MARIADB} mysql -h 127.0.0.1 -proot -e  "CREATE DATABASE $(name)"
+	${CONTAINER_MARIADB} mysql -h 127.0.0.1 -proot -e  "GRANT ALL PRIVILEGES ON $(name).* TO 'user'@'%' WITH GRANT OPTION"
 
 # Wilcard unused targets, including error
 # Need for avoid ${SUBCOMMAND} missing target false flag. (Clever, if you find better)
